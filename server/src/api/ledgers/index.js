@@ -16,4 +16,21 @@ router.get('/', (req, res) => {
   res.status(200).json(ledgers.slice(0, limit));
 });
 
+router.post('/', (req, res) => {
+  const { name, description } = req.body;
+
+  if (!name || !description) {
+    return res.status(400).end();
+  }
+
+  const newLedger = {
+    id: ledgers.length + 1,
+    name,
+    description,
+  };
+
+  ledgers = [newLedger, ...ledgers];
+  res.status(201).json(newLedger);
+});
+
 module.exports = router;

@@ -66,3 +66,30 @@ describe('POST /api/ledgers는', () => {
     });
   });
 });
+
+describe('GET /api/ledgers/:id는', () => {
+  describe('성공시', () => {
+    test('id에 해당하는 가계부 객체와 200을 반환한다.', async () => {
+      const res = await request(app).get('/api/ledgers/1');
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('id', 1);
+      expect(res.body).toHaveProperty('name');
+      expect(res.body).toHaveProperty('description');
+    });
+  });
+
+  describe('실패시', () => {
+    test('존재하지 않는 id일 경우 404를 반환한다.', async () => {
+      const res = await request(app).get('/api/ledgers/9999');
+
+      expect(res.status).toBe(404);
+    });
+
+    test('id가 숫자형이 아닐 경우 400을 반환한다.', async () => {
+      const res = await request(app).get('/api/ledgers/abc');
+
+      expect(res.status).toBe(400);
+    });
+  });
+});

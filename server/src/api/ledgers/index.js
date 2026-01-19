@@ -33,4 +33,20 @@ router.post('/', (req, res) => {
   res.status(201).json(newLedger);
 });
 
+router.get('/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+
+  if (isNaN(id)) {
+    return res.status(400).end();
+  }
+
+  const ledger = ledgers.find((ledger) => ledger.id === id);
+
+  if (!ledger) {
+    return res.status(404).end();
+  }
+
+  res.status(200).json(ledger);
+});
+
 module.exports = router;

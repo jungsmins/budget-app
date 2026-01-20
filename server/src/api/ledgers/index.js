@@ -49,4 +49,38 @@ router.get('/:id', (req, res) => {
   res.status(200).json(ledger);
 });
 
+router.put('/:id', (req, res) => {
+  const { name, description } = req.body;
+  const id = parseInt(req.params.id, 10);
+
+  if (!name && !description) {
+    return res.status(400).end();
+  }
+
+  if (isNaN(id)) {
+    return res.status(400).end();
+  }
+
+  const selectedLedger = ledgers.find((ledger) => ledger.id === id);
+
+  if (!selectedLedger) {
+    return res.status(404).end();
+  }
+
+  const updateLedger = {
+    id: selectedLedger.id,
+    name: name || selectedLedger.name,
+    description: description || selectedLedger.description,
+  };
+
+  ledgers = ledgers.map((ledger) => {
+    if (ledger.id === id) {
+      return updateLedger;
+    }
+    return ledger;
+  });
+
+  res.status(200).json(updateLedger);
+});
+
 module.exports = router;

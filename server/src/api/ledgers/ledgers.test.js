@@ -3,7 +3,7 @@ const app = require('../../app');
 
 describe('GET /api/ledgers는', () => {
   describe('성공시', () => {
-    test('가계부 목록을 담은 배열과 201을 반환한다.', async () => {
+    test('가계부 목록을 담은 배열과 200을 반환한다.', async () => {
       const res = await request(app).get('/api/ledgers');
 
       expect(res.status).toBe(200);
@@ -19,7 +19,7 @@ describe('GET /api/ledgers는', () => {
   });
 
   describe('실패시', () => {
-    test('limit이 숫자형이 아닐 경우 400을 반환한다.', async () => {
+    test('limit이 숫자형이 아니면 400을 반환한다.', async () => {
       const res = await request(app).get('/api/ledgers').query({ limit: 'a' });
 
       expect(res.status).toBe(400);
@@ -80,14 +80,56 @@ describe('GET /api/ledgers/:id는', () => {
   });
 
   describe('실패시', () => {
-    test('존재하지 않는 id일 경우 404를 반환한다.', async () => {
+    test('존재하지 않는 가계부라면 404를 반환한다.', async () => {
       const res = await request(app).get('/api/ledgers/9999');
 
       expect(res.status).toBe(404);
     });
 
-    test('id가 숫자형이 아닐 경우 400을 반환한다.', async () => {
+    test('id가 숫자형이 아니면 400을 반환한다.', async () => {
       const res = await request(app).get('/api/ledgers/abc');
+
+      expect(res.status).toBe(400);
+    });
+  });
+});
+
+describe('PUT /api/ledgers/:id는', () => {
+  describe('성공시', () => {
+    test('id에 해당하는 가계부를 수정하고 수정된 가계부와 200을 반환한다.', async () => {
+      const res = await request(app).put('/api/ledgers/1').send({
+        name: '가계부 수정',
+        description: '수정된 가계부입니다.',
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('id', 1);
+      expect(res.body).toHaveProperty('name', '가계부 수정');
+      expect(res.body).toHaveProperty('description', '수정된 가계부입니다.');
+    });
+  });
+
+  describe('실패시', () => {
+    test('name과 description이 모두 없으면 400을 반환한다.', async () => {
+      const res = await request(app).put('/api/ledgers/1').send({});
+
+      expect(res.status).toBe(400);
+    });
+
+    test('존재하지 않는 가계부라면 404를 반환한다.', async () => {
+      const res = await request(app).put('/api/ledgers/9999').send({
+        name: '가계부 수정',
+        description: '수정된 가계부입니다.',
+      });
+
+      expect(res.status).toBe(404);
+    });
+
+    test('id가 숫자형이 아니면 400을 반환한다.', async () => {
+      const res = await request(app).put('/api/ledgers/abc').send({
+        name: '가계부 수정',
+        description: '수정된 가계부입니다.',
+      });
 
       expect(res.status).toBe(400);
     });

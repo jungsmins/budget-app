@@ -135,3 +135,29 @@ describe('PUT /api/ledgers/:id는', () => {
     });
   });
 });
+
+describe('DELETE /api/ledgers/:id는', () => {
+  describe('성공시', () => {
+    test('id에 해당하는 가계부를 가계부 목록에서 삭제하고 204를 반환한다.', async () => {
+      const res = await request(app).delete('/api/ledgers/1');
+      const getRes = await request(app).get('/api/ledgers/1');
+
+      expect(res.status).toBe(204);
+      expect(getRes.status).toBe(404);
+    });
+  });
+
+  describe('실패시', () => {
+    test('존재하지 않는 가계부라면 404를 반환한다.', async () => {
+      const res = await request(app).delete('/api/ledgers/9999');
+
+      expect(res.status).toBe(404);
+    });
+
+    test('id가 숫자형이 아니면 400을 반환한다.', async () => {
+      const res = await request(app).delete('/api/ledgers/abc');
+
+      expect(res.status).toBe(400);
+    });
+  });
+});

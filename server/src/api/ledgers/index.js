@@ -83,4 +83,22 @@ router.put('/:id', (req, res) => {
   res.status(200).json(updateLedger);
 });
 
+router.delete('/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+
+  if (isNaN(id)) {
+    return res.status(400).end();
+  }
+
+  const ledger = ledgers.find((ledger) => ledger.id === id);
+
+  if (!ledger) {
+    return res.status(404).end();
+  }
+
+  ledgers = ledgers.filter((ledger) => ledger.id !== id);
+
+  res.status(204).end();
+});
+
 module.exports = router;

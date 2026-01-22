@@ -1,3 +1,9 @@
+const router = require('express').Router();
 const ledgersRoutes = require('./ledgers.routes');
+const transactionsRouter = require('../transactions');
 
-module.exports = ledgersRoutes;
+router.use('/', ledgersRoutes);
+
+router.use('/:ledgerId/transactions', transactionsRouter);
+
+module.exports = router;

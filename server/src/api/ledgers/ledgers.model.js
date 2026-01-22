@@ -1,8 +1,5 @@
-let ledgers = [
-  { id: 1, name: '첫번째 가계부', description: '나의 첫번째 가계부' },
-  { id: 2, name: '두번째 가계부', description: '나의 두번째 가계부' },
-  { id: 3, name: '세번째 가계부', description: '나의 세번째 가계부' },
-];
+const mockData = require('../../data/mockData');
+let ledgers = mockData.ledgers;
 
 const findAll = (limit) => {
   return ledgers.slice(0, limit);

@@ -15,11 +15,9 @@ router.get('/', (req, res) => {
     return res.status(404).end();
   }
 
-  const ledgerTransactions = transactions.filter((transaction) => {
-    if (transaction.ledgerId === ledgerId) {
-      return transaction;
-    }
-  });
+  const ledgerTransactions = transactions.filter(
+    (transaction) => transaction.ledgerId === ledgerId
+  );
 
   res.status(200).json(ledgerTransactions);
 });
@@ -53,6 +51,58 @@ router.post('/', (req, res) => {
   transactions.push(newTransaction);
 
   res.status(201).json(newTransaction);
+});
+
+router.put('/:id', (req, res) => {
+  const ledgerId = parseInt(req.params.ledgerId, 10);
+  const id = parseInt(req.params.id, 10);
+  const { type, amount, category, description, date } = req.body;
+
+  if (isNaN(ledgerId)) {
+    return res.status(400).end();
+  }
+
+  if (isNaN(id)) {
+    return res.status(400).end();
+  }
+
+  if (!type || !amount || !category || !description || !date) {
+    return res.status(400).end();
+  }
+
+  if (!ledgers.findById(ledgerId)) {
+    return res.status(404).end();
+  }
+
+  const selectedTransaction = transactions.find(
+    (transaction) => transaction.id === id
+  );
+
+  if (!selectedTransaction) {
+    return res.status(404).end();
+  }
+
+  if (selectedTransaction.ledgerId !== ledgerId) {
+    return res.status(404).end();
+  }
+
+  const updateTransaction = {
+    ...selectedTransaction,
+    type,
+    amount,
+    category,
+    description,
+    date,
+  };
+
+  transactions = transactions.map((transaction) => {
+    if (transaction.id === id) {
+      return updateTransaction;
+    }
+    return transaction;
+  });
+
+  res.status(200).json(updateTransaction);
 });
 
 module.exports = router;

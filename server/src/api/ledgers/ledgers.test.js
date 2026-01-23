@@ -17,7 +17,7 @@ describe('GET /api/ledgers는', () => {
   });
 
   describe('실패시', () => {
-    test('limit이 숫자형이 아니면 400을 반환한다.', async () => {
+    test('limit이 숫자가 아니면 400을 반환한다.', async () => {
       await request(app).get('/api/ledgers').query({ limit: 'a' }).expect(400);
     });
   });
@@ -77,12 +77,12 @@ describe('GET /api/ledgers/:id는', () => {
   });
 
   describe('실패시', () => {
-    test('존재하지 않는 가계부라면 404를 반환한다.', async () => {
-      await request(app).get('/api/ledgers/9999').expect(404);
+    test('id가 숫자가 아니면 400을 반환한다.', async () => {
+      await request(app).get('/api/ledgers/abc').expect(400);
     });
 
-    test('id가 숫자형이 아니면 400을 반환한다.', async () => {
-      await request(app).get('/api/ledgers/abc').expect(400);
+    test('가계부가 존재하지 않으면 404를 반환한다.', async () => {
+      await request(app).get('/api/ledgers/9999').expect(404);
     });
   });
 });
@@ -105,11 +105,17 @@ describe('PUT /api/ledgers/:id는', () => {
   });
 
   describe('실패시', () => {
-    test('name과 description이 모두 없으면 400을 반환한다.', async () => {
-      await request(app).put('/api/ledgers/1').send({}).expect(400);
+    test('id가 숫자가 아니면 400을 반환한다.', async () => {
+      await request(app)
+        .put('/api/ledgers/abc')
+        .send({
+          name: '가계부 수정',
+          description: '수정된 가계부입니다.',
+        })
+        .expect(400);
     });
 
-    test('존재하지 않는 가계부라면 404를 반환한다.', async () => {
+    test('가계부가 존재하지 않으면 404를 반환한다.', async () => {
       await request(app)
         .put('/api/ledgers/9999')
         .send({
@@ -119,14 +125,8 @@ describe('PUT /api/ledgers/:id는', () => {
         .expect(404);
     });
 
-    test('id가 숫자형이 아니면 400을 반환한다.', async () => {
-      await request(app)
-        .put('/api/ledgers/abc')
-        .send({
-          name: '가계부 수정',
-          description: '수정된 가계부입니다.',
-        })
-        .expect(400);
+    test('name과 description이 모두 없으면 400을 반환한다.', async () => {
+      await request(app).put('/api/ledgers/1').send({}).expect(400);
     });
   });
 });
@@ -140,12 +140,12 @@ describe('DELETE /api/ledgers/:id는', () => {
   });
 
   describe('실패시', () => {
-    test('존재하지 않는 가계부라면 404를 반환한다.', async () => {
-      await request(app).delete('/api/ledgers/9999').expect(404);
+    test('id가 숫자가 아니면 400을 반환한다.', async () => {
+      await request(app).delete('/api/ledgers/abc').expect(400);
     });
 
-    test('id가 숫자형이 아니면 400을 반환한다.', async () => {
-      await request(app).delete('/api/ledgers/abc').expect(400);
+    test('가계부가 존재하지 않으면 404를 반환한다.', async () => {
+      await request(app).delete('/api/ledgers/9999').expect(404);
     });
   });
 });

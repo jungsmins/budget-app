@@ -16,7 +16,7 @@ router.get('/', (req, res) => {
   }
 
   const ledgerTransactions = transactions.filter(
-    (transaction) => transaction.ledgerId === ledgerId
+    (transaction) => transaction.ledgerId === ledgerId,
   );
 
   res.status(200).json(ledgerTransactions);
@@ -75,7 +75,7 @@ router.put('/:id', (req, res) => {
   }
 
   const selectedTransaction = transactions.find(
-    (transaction) => transaction.id === id
+    (transaction) => transaction.id === id,
   );
 
   if (!selectedTransaction) {
@@ -103,6 +103,39 @@ router.put('/:id', (req, res) => {
   });
 
   res.status(200).json(updateTransaction);
+});
+
+router.delete('/:id', (req, res) => {
+  const ledgerId = parseInt(req.params.ledgerId, 10);
+  const id = parseInt(req.params.id, 10);
+
+  if (isNaN(ledgerId)) {
+    return res.status(400).end();
+  }
+
+  if (isNaN(id)) {
+    return res.status(400).end();
+  }
+
+  if (!ledgers.findById(ledgerId)) {
+    return res.status(404).end();
+  }
+
+  const selectedTransaction = transactions.find(
+    (transaction) => transaction.id === id,
+  );
+
+  if (!selectedTransaction) {
+    return res.status(404).end();
+  }
+
+  if (selectedTransaction.ledgerId !== ledgerId) {
+    return res.status(404).end();
+  }
+
+  transactions = transactions.filter((transaction) => transaction.id !== id);
+
+  res.status(204).end();
 });
 
 module.exports = router;

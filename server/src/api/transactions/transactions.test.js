@@ -202,12 +202,51 @@ describe('PUT /api/ledgers/:ledgerId/transactions/:transactionsId는', () => {
   });
 });
 
-// 성공시:
-// - 거래 내역을 수정하고 200을 반환한다.
-// 실패시:
-// - ledgerId가 숫자가 아니면 400을 반환한다.
-// - 가계부가 존재하지 않으면 404를 반환한다.
-// - transactionId가 숫자가 아니면 400을 반환한다.
-// - 거래 내역이 존재하지 않으면 404를 반환한다.
-// - 필수 필드가 없으면 400을 반환한다.
-// - 거래 내역이 해당 가계부에 속하지 않으면 404를 반환한다. (중요!)
+describe('DELETE /api/ledgers/:ledgerId/transactions/:transactionId는', () => {
+  describe('성공시', () => {
+    test('거래 내역을 삭제하고 204를 반환한다.', async () => {
+      await request(app)
+        .delete('/api/ledgers/1/transactions/1')
+        .expect(204);
+
+      const res = await request(app)
+        .get('/api/ledgers/1/transactions')
+        .expect(200);
+
+      const deleted = res.body.find((transaction) => transaction.id === 1);
+      expect(deleted).toBeUndefined();
+    });
+  });
+
+  describe('실패시', () => {
+    test('ledgerId가 숫자가 아니면 400을 반환한다.', async () => {
+      await request(app)
+        .delete('/api/ledgers/abc/transactions/1')
+        .expect(400);
+    });
+
+    test('가계부가 존재하지 않으면 404를 반환한다.', async () => {
+      await request(app)
+        .delete('/api/ledgers/999/transactions/1')
+        .expect(404);
+    });
+
+    test('transactionId가 숫자가 아니면 400을 반환한다.', async () => {
+      await request(app)
+        .delete('/api/ledgers/1/transactions/abc')
+        .expect(400);
+    });
+
+    test('거래 내역이 존재하지 않으면 404를 반환한다.', async () => {
+      await request(app)
+        .delete('/api/ledgers/1/transactions/999')
+        .expect(404);
+    });
+
+    test('거래 내역이 해당 가계부에 속하지 않으면 404를 반환한다.', async () => {
+      await request(app)
+        .delete('/api/ledgers/1/transactions/4')
+        .expect(404);
+    });
+  });
+});

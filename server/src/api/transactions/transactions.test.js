@@ -22,6 +22,37 @@ describe('GET /api/ledgers/:ledgerId/transactions는', () => {
       expect(res.body).toBeInstanceOf(Array);
       expect(res.body).toHaveLength(0);
     });
+
+    test('category query로 필터링하여 거래 내역을 반환한다.', async () => {
+      const res = await request(app)
+        .get('/api/ledgers/1/transactions?category=식비')
+        .expect(200);
+
+      expect(res.body).toBeInstanceOf(Array);
+      res.body.forEach((transaction) => {
+        expect(transaction.category).toBe('식비');
+      });
+    });
+
+    test('존재하지 않는 category는 빈 배열을 반환한다.', async () => {
+      const res = await request(app)
+        .get('/api/ledgers/1/transactions?category=존재하지않는카테고리')
+        .expect(200);
+
+      expect(res.body).toBeInstanceOf(Array);
+      expect(res.body).toHaveLength(0);
+    });
+
+    test('month query로 년-월 필터링하여 거래 내역을 반환한다.', async () => {
+      const res = await request(app)
+        .get('/api/ledgers/1/transactions?month=2026-01')
+        .expect(200);
+
+      expect(res.body).toBeInstanceOf(Array);
+      res.body.forEach((transaction) => {
+        expect(transaction.date).toMatch(/^2026-01/);
+      });
+    });
   });
 
   describe('실패시', () => {
@@ -31,6 +62,30 @@ describe('GET /api/ledgers/:ledgerId/transactions는', () => {
 
     test('가계부가 존재하지 않으면 404를 반환한다.', async () => {
       await request(app).get('/api/ledgers/999/transactions').expect(404);
+    });
+
+    test('month 형식이 잘못되면 400을 반환한다. (yyyy-mm가 아님)', async () => {
+      await request(app)
+        .get('/api/ledgers/1/transactions?month=2026/01')
+        .expect(400);
+    });
+
+    test('month의 월이 유효하지 않으면 400을 반환한다. (13월)', async () => {
+      await request(app)
+        .get('/api/ledgers/1/transactions?month=2026-13')
+        .expect(400);
+    });
+
+    test('month의 월이 유효하지 않으면 400을 반환한다. (00월)', async () => {
+      await request(app)
+        .get('/api/ledgers/1/transactions?month=2026-00')
+        .expect(400);
+    });
+
+    test('month 형식이 잘못되면 400을 반환한다. (월이 한자리)', async () => {
+      await request(app)
+        .get('/api/ledgers/1/transactions?month=2026-1')
+        .expect(400);
     });
   });
 });
@@ -205,9 +260,7 @@ describe('PUT /api/ledgers/:ledgerId/transactions/:transactionsId는', () => {
 describe('DELETE /api/ledgers/:ledgerId/transactions/:transactionId는', () => {
   describe('성공시', () => {
     test('거래 내역을 삭제하고 204를 반환한다.', async () => {
-      await request(app)
-        .delete('/api/ledgers/1/transactions/1')
-        .expect(204);
+      await request(app).delete('/api/ledgers/1/transactions/1').expect(204);
 
       const res = await request(app)
         .get('/api/ledgers/1/transactions')
@@ -220,33 +273,23 @@ describe('DELETE /api/ledgers/:ledgerId/transactions/:transactionId는', () => {
 
   describe('실패시', () => {
     test('ledgerId가 숫자가 아니면 400을 반환한다.', async () => {
-      await request(app)
-        .delete('/api/ledgers/abc/transactions/1')
-        .expect(400);
+      await request(app).delete('/api/ledgers/abc/transactions/1').expect(400);
     });
 
     test('가계부가 존재하지 않으면 404를 반환한다.', async () => {
-      await request(app)
-        .delete('/api/ledgers/999/transactions/1')
-        .expect(404);
+      await request(app).delete('/api/ledgers/999/transactions/1').expect(404);
     });
 
     test('transactionId가 숫자가 아니면 400을 반환한다.', async () => {
-      await request(app)
-        .delete('/api/ledgers/1/transactions/abc')
-        .expect(400);
+      await request(app).delete('/api/ledgers/1/transactions/abc').expect(400);
     });
 
     test('거래 내역이 존재하지 않으면 404를 반환한다.', async () => {
-      await request(app)
-        .delete('/api/ledgers/1/transactions/999')
-        .expect(404);
+      await request(app).delete('/api/ledgers/1/transactions/999').expect(404);
     });
 
     test('거래 내역이 해당 가계부에 속하지 않으면 404를 반환한다.', async () => {
-      await request(app)
-        .delete('/api/ledgers/1/transactions/4')
-        .expect(404);
+      await request(app).delete('/api/ledgers/1/transactions/4').expect(404);
     });
   });
 });

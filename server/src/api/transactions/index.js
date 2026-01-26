@@ -6,6 +6,8 @@ let transactions = mockData.transactions;
 
 router.get('/', (req, res) => {
   const ledgerId = parseInt(req.params.ledgerId, 10);
+  const { category, month } = req.query;
+  const monthRegex = /^\d{4}-(0[1-9]|1[0-2])$/;
 
   if (isNaN(ledgerId)) {
     return res.status(400).end();
@@ -15,9 +17,25 @@ router.get('/', (req, res) => {
     return res.status(404).end();
   }
 
-  const ledgerTransactions = transactions.filter(
-    (transaction) => transaction.ledgerId === ledgerId,
-  );
+  if (month && !monthRegex.test(month)) {
+    return res.status(400).end();
+  }
+
+  let ledgerTransactions = transactions.filter((transaction) => {
+    return transaction.ledgerId === ledgerId;
+  });
+
+  if (category) {
+    ledgerTransactions = ledgerTransactions.filter((transaction) => {
+      return transaction.category === category;
+    });
+  }
+
+  if (month) {
+    ledgerTransactions = ledgerTransactions.filter((transaction) => {
+      return transaction.date.startsWith(month);
+    });
+  }
 
   res.status(200).json(ledgerTransactions);
 });

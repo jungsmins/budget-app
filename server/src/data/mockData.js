@@ -21,7 +21,7 @@ let transactions = [
     amount: 2000,
     category: '생활비',
     description: '세면 도구 구매',
-    date: '2026-01-09',
+    date: '2026-01-10',
   },
   {
     id: 3,
@@ -30,7 +30,7 @@ let transactions = [
     amount: 7000,
     category: '식비',
     description: '점심 밥',
-    date: '2026-01-10',
+    date: '2026-02-10',
   },
   {
     id: 4,

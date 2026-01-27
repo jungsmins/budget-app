@@ -4,52 +4,24 @@ const ledgers = require('../ledgers/ledgers.model');
 let transactions = mockData.transactions;
 
 const findById = (id) => {
-  const transaction = transactions.find((transaction) => {
-    return transaction.id === id;
-  });
-
-  if (!transaction) {
-    return false;
-  }
-
-  return transaction;
+  return transactions.find((transaction) => transaction.id === id);
 };
 
 const findByLedgerId = (ledgerId) => {
   const ledger = ledgers.findById(ledgerId);
 
   if (!ledger) {
-    return false;
+    return null;
   }
 
-  return transactions.filter((transaction) => {
-    return transaction.ledgerId === ledgerId;
-  });
+  return transactions.filter((transaction) => transaction.ledgerId === ledgerId);
 };
 
-const findOfCategory = (ledgerId, category) => {
-  const ledgerTransactions = findByLedgerId(ledgerId);
-  const selectedTransactions = ledgerTransactions.filter((transaction) => {
-    return transaction.category === category;
-  });
-
-  return selectedTransactions;
-};
-
-const findOfMonth = (ledgerId, month) => {
-  const ledgerTransactions = findByLedgerId(ledgerId);
-  const selectedTransactions = ledgerTransactions.filter((transactions) => {
-    return transactions.date.startsWith(month);
-  });
-
-  return selectedTransactions;
-};
-
-const create = (ledgerId, type, amount, category, description, date) => {
+const create = (ledgerId, { type, amount, category, description, date }) => {
   const ledger = ledgers.findById(ledgerId);
 
   if (!ledger) {
-    return false;
+    return null;
   }
 
   const newTransaction = {
@@ -67,11 +39,15 @@ const create = (ledgerId, type, amount, category, description, date) => {
   return newTransaction;
 };
 
-const update = (id, type, amount, category, description, date) => {
-  const transaction = findById(id);
+const update = (id, { type, amount, category, description, date }) => {
+  const selectedTransaction = findById(id);
 
-  const updateTransaction = {
-    ...transaction,
+  if (!selectedTransaction) {
+    return null;
+  }
+
+  const updatedTransaction = {
+    ...selectedTransaction,
     type,
     amount,
     category,
@@ -81,13 +57,13 @@ const update = (id, type, amount, category, description, date) => {
 
   transactions = transactions.map((transaction) => {
     if (transaction.id === id) {
-      return updateTransaction;
+      return updatedTransaction;
     }
 
     return transaction;
   });
 
-  return updateTransaction;
+  return updatedTransaction;
 };
 
 const remove = (id) => {
@@ -105,8 +81,6 @@ const remove = (id) => {
 module.exports = {
   findById,
   findByLedgerId,
-  findOfCategory,
-  findOfMonth,
   create,
   update,
   remove,

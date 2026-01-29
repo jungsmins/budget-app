@@ -1,81 +1,80 @@
-const mockData = require('../../data/mockData');
-const ledgers = require('../ledgers/ledgers.model');
+const Transactions = require('./transactions.schema');
+const mongoose = require('mongoose');
 
-let transactions = mockData.transactions;
-
-const findById = (id) => {
-  return transactions.find((transaction) => transaction.id === id);
-};
-
-const findByLedgerId = (ledgerId) => {
-  const ledger = ledgers.findById(ledgerId);
-
-  if (!ledger) {
+const findById = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     return null;
   }
 
-  return transactions.filter((transaction) => transaction.ledgerId === ledgerId);
+  const transaction = await Transactions.findById(id).lean();
+
+  return transaction;
 };
 
-const create = (ledgerId, { type, amount, category, description, date }) => {
-  const ledger = ledgers.findById(ledgerId);
-
-  if (!ledger) {
+const findByLedgerId = async (ledgerId) => {
+  if (!mongoose.Types.ObjectId.isValid(ledgerId)) {
     return null;
   }
 
-  const newTransaction = {
-    id: transactions.length + 1,
+  const transactions = await Transactions.find({ ledgerId })
+    .sort({ date: -1 })
+    .lean();
+
+  return transactions;
+};
+
+const create = async (
+  ledgerId,
+  { type, amount, category, description, date },
+) => {
+  if (!mongoose.Types.ObjectId.isValid(ledgerId)) {
+    return null;
+  }
+
+  const newTransaction = await Transactions.create({
     ledgerId,
     type,
     amount,
     category,
     description,
     date,
-  };
+  });
 
-  transactions = [newTransaction, ...transactions];
-
-  return newTransaction;
+  return newTransaction.toJSON();
 };
 
-const update = (id, { type, amount, category, description, date }) => {
-  const selectedTransaction = findById(id);
-
-  if (!selectedTransaction) {
+const update = async (id, { type, amount, category, description, date }) => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     return null;
   }
 
-  const updatedTransaction = {
-    ...selectedTransaction,
-    type,
-    amount,
-    category,
-    description,
-    date,
-  };
+  const updateData = {};
+  if (type !== undefined) updateData.type = type;
+  if (amount !== undefined) updateData.amount = amount;
+  if (category !== undefined) updateData.category = category;
+  if (description !== undefined) updateData.description = description;
+  if (date !== undefined) updateData.date = date;
 
-  transactions = transactions.map((transaction) => {
-    if (transaction.id === id) {
-      return updatedTransaction;
-    }
+  const updateTransaction = await Transactions.findByIdAndUpdate(
+    id,
+    updateData,
+    {
+      new: true,
+      runValidators: true,
+    },
+  ).lean();
 
-    return transaction;
-  });
-
-  return updatedTransaction;
+  return updateTransaction;
 };
 
-const remove = (id) => {
-  const transaction = findById(id);
-
-  if (!transaction) {
-    return false;
+const remove = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return null;
   }
 
-  transactions = transactions.filter((transaction) => transaction.id !== id);
+  const result = await Transactions.findByIdAndDelete(id);
 
-  return true;
+  return result !== null;
 };
 
 module.exports = {

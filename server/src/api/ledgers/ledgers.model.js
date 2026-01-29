@@ -1,60 +1,55 @@
-const mockData = require('../../data/mockData');
-let ledgers = mockData.ledgers;
+const Ledger = require('./ledgers.schema');
+const mongoose = require('mongoose');
 
-const findAll = (limit) => {
-  return ledgers.slice(0, limit);
+const findAll = async (limit) => {
+  const ledgers = await Ledger.find()
+    .sort({ createdAt: -1 })
+    .limit(limit)
+    .lean();
+
+  return ledgers;
 };
 
-const findById = (id) => {
-  return ledgers.find((ledger) => ledger.id === id);
-};
-
-const create = ({ name, description }) => {
-  const newLedger = {
-    id: ledgers.length + 1,
-    name,
-    description,
-  };
-
-  ledgers = [newLedger, ...ledgers];
-
-  return newLedger;
-};
-
-const update = (id, { name, description }) => {
-  const selectedLedger = findById(id);
-
-  if (!selectedLedger) {
+const findById = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     return null;
   }
 
-  const updatedLedger = {
-    id: selectedLedger.id,
-    name: name || selectedLedger.name,
-    description: description || selectedLedger.description,
-  };
+  const ledger = await Ledger.findById(id).lean();
 
-  ledgers = ledgers.map((ledger) => {
-    if (ledger.id === id) {
-      return updatedLedger;
-    }
-
-    return ledger;
-  });
-
-  return updatedLedger;
+  return ledger;
 };
 
-const remove = (id) => {
-  const ledger = findById(id);
+const create = async ({ name, description }) => {
+  const newLedger = Ledger.create({ name, description });
+  return newLedger.toJSON();
+};
 
-  if (!ledger) {
-    return false;
+const update = async (id, { name, description }) => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return null;
   }
 
-  ledgers = ledgers.filter((ledger) => ledger.id !== id);
+  const updateData = {};
+  if (name !== undefined) updateData.name = name;
+  if (description !== undefined) updateData.description = description;
 
-  return true;
+  const updateLedger = await Ledger.findByIdAndUpdate(id, updateData, {
+    new: true,
+    runValidators: true,
+  }).lean();
+
+  return updateLedger;
+};
+
+const remove = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return null;
+  }
+
+  const result = await Ledger.findByIdAndDelete(id);
+
+  return result !== null;
 };
 
 module.exports = {

@@ -1,146 +1,117 @@
 const model = require('./transactions.model');
 const ledgersModel = require('../ledgers/ledgers.model');
 
-const getAll = (req, res) => {
-  const ledgerId = parseInt(req.params.ledgerId, 10);
-  const { category, month } = req.query;
-  const monthRegex = /^\d{4}-(0[1-9]|1[0-2])$/;
+const getAll = async (req, res) => {
+  try {
+    const ledgerId = req.params.ledgerId;
+    const { category, month } = req.query;
+    const monthRegex = /^\d{4}-(0[1-9]|1[0-2])$/;
 
-  if (isNaN(ledgerId)) {
-    return res.status(400).end();
+    if (month && !monthRegex.test(month)) {
+      return res.status(400).end();
+    }
+
+    let ledgerTransactions = await model.findByLedgerId(ledgerId, {
+      category,
+      month,
+    });
+
+    if (!ledgerTransactions) {
+      return res.status(404).end();
+    }
+
+    res.status(200).json(ledgerTransactions);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-
-  if (month && !monthRegex.test(month)) {
-    return res.status(400).end();
-  }
-
-  let ledgerTransactions = model.findByLedgerId(ledgerId);
-
-  if (!ledgerTransactions) {
-    return res.status(404).end();
-  }
-
-  if (category) {
-    ledgerTransactions = ledgerTransactions.filter(
-      (transaction) => transaction.category === category,
-    );
-  }
-
-  if (month) {
-    ledgerTransactions = ledgerTransactions.filter((transaction) =>
-      transaction.date.startsWith(month),
-    );
-  }
-
-  res.status(200).json(ledgerTransactions);
 };
 
-const create = (req, res) => {
-  const ledgerId = parseInt(req.params.ledgerId, 10);
-  const { type, amount, category, description, date } = req.body;
+const create = async (req, res) => {
+  try {
+    const ledgerId = req.params.ledgerId;
+    const { type, amount, category, description, date } = req.body;
 
-  if (isNaN(ledgerId)) {
-    return res.status(400).end();
+    if (!type || !amount || !category || !description || !date) {
+      return res.status(400).end();
+    }
+
+    const newTransaction = await model.create(ledgerId, {
+      type,
+      amount,
+      category,
+      description,
+      date,
+    });
+
+    if (!newTransaction) {
+      return res.status(404).end();
+    }
+
+    res.status(201).json(newTransaction);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-
-  if (!type || !amount || !category || !description || !date) {
-    return res.status(400).end();
-  }
-
-  const newTransaction = model.create(ledgerId, {
-    type,
-    amount,
-    category,
-    description,
-    date,
-  });
-
-  if (!newTransaction) {
-    return res.status(404).end();
-  }
-
-  res.status(201).json(newTransaction);
 };
 
-const update = (req, res) => {
-  const ledgerId = parseInt(req.params.ledgerId, 10);
-  const id = parseInt(req.params.id, 10);
-  const { type, amount, category, description, date } = req.body;
+const update = async (req, res) => {
+  try {
+    const ledgerId = req.params.ledgerId;
+    const id = req.params.id;
+    const { type, amount, category, description, date } = req.body;
 
-  if (isNaN(ledgerId)) {
-    return res.status(400).end();
+    if (!type && !amount && !category && !description && !date) {
+      return res.status(400).end();
+    }
+
+    const transaction = await model.findById(id);
+
+    if (!transaction) {
+      return res.status(404).end();
+    }
+
+    if (transaction.ledgerId.toString() !== ledgerId) {
+      return res.status(404).end();
+    }
+
+    const updatedTransaction = await model.update(id, {
+      type,
+      amount,
+      category,
+      description,
+      date,
+    });
+
+    res.status(200).json(updatedTransaction);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-
-  if (isNaN(id)) {
-    return res.status(400).end();
-  }
-
-  if (!type || !amount || !category || !description || !date) {
-    return res.status(400).end();
-  }
-
-  const ledger = ledgersModel.findById(ledgerId);
-
-  if (!ledger) {
-    return res.status(404).end();
-  }
-
-  const transaction = model.findById(id);
-
-  if (!transaction) {
-    return res.status(404).end();
-  }
-
-  if (transaction.ledgerId !== ledgerId) {
-    return res.status(404).end();
-  }
-
-  const updatedTransaction = model.update(id, {
-    type,
-    amount,
-    category,
-    description,
-    date,
-  });
-
-  res.status(200).json(updatedTransaction);
 };
 
-const remove = (req, res) => {
-  const ledgerId = parseInt(req.params.ledgerId, 10);
-  const id = parseInt(req.params.id, 10);
+const remove = async (req, res) => {
+  try {
+    const ledgerId = req.params.ledgerId;
+    const id = req.params.id;
 
-  if (isNaN(ledgerId)) {
-    return res.status(400).end();
+    const transaction = await model.findById(id);
+
+    if (!transaction) {
+      return res.status(404).end();
+    }
+
+    if (transaction.ledgerId.toString() !== ledgerId) {
+      return res.status(404).end();
+    }
+
+    const deleted = await model.remove(id);
+
+    if (!deleted) {
+      return res.status(404).end();
+    }
+
+    res.status(204).end();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-
-  if (isNaN(id)) {
-    return res.status(400).end();
-  }
-
-  const ledger = ledgersModel.findById(ledgerId);
-
-  if (!ledger) {
-    return res.status(404).end();
-  }
-
-  const transaction = model.findById(id);
-
-  if (!transaction) {
-    return res.status(404).end();
-  }
-
-  if (transaction.ledgerId !== ledgerId) {
-    return res.status(404).end();
-  }
-
-  const deleted = model.remove(id);
-
-  if (!deleted) {
-    return res.status(404).end();
-  }
-
-  res.status(204).end();
 };
 
 module.exports = {

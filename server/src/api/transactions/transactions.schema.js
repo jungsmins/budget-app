@@ -5,6 +5,7 @@ const transactionSchema = mongoose.Schema(
     ledgerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Ledger',
+      required: [true, 'LedgerId is required'],
       index: true,
     },
     type: {

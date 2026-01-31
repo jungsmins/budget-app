@@ -11,14 +11,22 @@ const findById = async (id) => {
   return transaction;
 };
 
-const findByLedgerId = async (ledgerId) => {
+const findByLedgerId = async (ledgerId, filters = {}) => {
   if (!mongoose.Types.ObjectId.isValid(ledgerId)) {
     return null;
   }
 
-  const transactions = await Transactions.find({ ledgerId })
-    .sort({ date: -1 })
-    .lean();
+  const query = { ledgerId };
+
+  if (filters.category) {
+    query.category = filters.category;
+  }
+
+  if (filters.month) {
+    query.date = { $regex: `^${filters.month}` };
+  }
+
+  const transactions = await Transactions.find(query).sort({ date: -1 }).lean();
 
   return transactions;
 };

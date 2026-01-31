@@ -1,78 +1,88 @@
 const model = require('./ledgers.model');
 
-const getAll = (req, res) => {
-  const limit = parseInt(req.query.limit || '10', 10);
+const getAll = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit || '10', 10);
 
-  if (isNaN(limit)) {
-    return res.status(400).end();
+    if (isNaN(limit)) {
+      return res.status(400).end();
+    }
+
+    const ledgers = await model.findAll(limit);
+
+    res.status(200).json(ledgers);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-
-  res.status(200).json(model.findAll(limit));
 };
 
-const getById = (req, res) => {
-  const id = parseInt(req.params.id, 10);
+const getById = async (req, res) => {
+  try {
+    const id = req.params.id;
 
-  if (isNaN(id)) {
-    return res.status(400).end();
+    const ledger = await model.findById(id);
+
+    if (!ledger) {
+      return res.status(404).end();
+    }
+
+    res.status(200).json(ledger);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-
-  const ledger = model.findById(id);
-
-  if (!ledger) {
-    return res.status(404).end();
-  }
-
-  res.status(200).json(ledger);
 };
 
-const create = (req, res) => {
-  const { name, description } = req.body;
+const create = async (req, res) => {
+  try {
+    const { name, description } = req.body;
 
-  if (!name || !description) {
-    return res.status(400).end();
+    if (!name || !description) {
+      return res.status(400).end();
+    }
+
+    const newLedger = await model.create({ name, description });
+
+    res.status(201).json(newLedger);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-
-  const newLedger = model.create({ name, description });
-
-  res.status(201).json(newLedger);
 };
 
-const update = (req, res) => {
-  const { name, description } = req.body;
-  const id = parseInt(req.params.id, 10);
+const update = async (req, res) => {
+  try {
+    const { name, description } = req.body;
+    const id = req.params.id;
 
-  if (!name && !description) {
-    return res.status(400).end();
+    if (!name && !description) {
+      return res.status(400).end();
+    }
+
+    const updatedLedger = await model.update(id, { name, description });
+
+    if (!updatedLedger) {
+      return res.status(404).end();
+    }
+
+    res.status(200).json(updatedLedger);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-
-  if (isNaN(id)) {
-    return res.status(400).end();
-  }
-
-  const updatedLedger = model.update(id, { name, description });
-
-  if (!updatedLedger) {
-    return res.status(404).end();
-  }
-
-  res.status(200).json(updatedLedger);
 };
 
-const remove = (req, res) => {
-  const id = parseInt(req.params.id, 10);
+const remove = async (req, res) => {
+  try {
+    const id = req.params.id;
 
-  if (isNaN(id)) {
-    return res.status(400).end();
+    const deleted = await model.remove(id);
+
+    if (!deleted) {
+      return res.status(404).end();
+    }
+
+    res.status(204).end();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-
-  const deleted = model.remove(id);
-
-  if (!deleted) {
-    return res.status(404).end();
-  }
-
-  res.status(204).end();
 };
 
 module.exports = {

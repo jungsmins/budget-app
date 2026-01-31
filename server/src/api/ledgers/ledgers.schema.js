@@ -35,6 +35,15 @@ ledgerSchema.set('toJSON', {
   },
 });
 
+ledgerSchema.pre('findOneAndDelete', async function (next) {
+  const ledgerId = this.getQuery()._id;
+  const Transaction = mongoose.model('Transaction');
+
+  await Transaction.deleteMany({ ledgerId });
+
+  next();
+});
+
 const Ledger = mongoose.model('Ledger', ledgerSchema);
 
 module.exports = Ledger;

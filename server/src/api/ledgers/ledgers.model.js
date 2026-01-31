@@ -21,7 +21,7 @@ const findById = async (id) => {
 };
 
 const create = async ({ name, description }) => {
-  const newLedger = Ledger.create({ name, description });
+  const newLedger = await Ledger.create({ name, description });
   return newLedger.toJSON();
 };
 

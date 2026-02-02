@@ -1,7 +1,7 @@
 const model = require('./transactions.model');
 const ledgersModel = require('../ledgers/ledgers.model');
 
-const getAll = async (req, res) => {
+const getAll = async (req, res, next) => {
   try {
     const ledgerId = req.params.ledgerId;
     const { category, month } = req.query;
@@ -22,11 +22,11 @@ const getAll = async (req, res) => {
 
     res.status(200).json(ledgerTransactions);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
-const create = async (req, res) => {
+const create = async (req, res, next) => {
   try {
     const ledgerId = req.params.ledgerId;
     const { type, amount, category, description, date } = req.body;
@@ -49,11 +49,11 @@ const create = async (req, res) => {
 
     res.status(201).json(newTransaction);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
-const update = async (req, res) => {
+const update = async (req, res, next) => {
   try {
     const ledgerId = req.params.ledgerId;
     const id = req.params.id;
@@ -83,11 +83,11 @@ const update = async (req, res) => {
 
     res.status(200).json(updatedTransaction);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
-const remove = async (req, res) => {
+const remove = async (req, res, next) => {
   try {
     const ledgerId = req.params.ledgerId;
     const id = req.params.id;
@@ -110,7 +110,7 @@ const remove = async (req, res) => {
 
     res.status(204).end();
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 

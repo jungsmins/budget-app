@@ -1,6 +1,6 @@
 const model = require('./ledgers.model');
 
-const getAll = async (req, res) => {
+const getAll = async (req, res, next) => {
   try {
     const limit = parseInt(req.query.limit || '10', 10);
 
@@ -12,11 +12,11 @@ const getAll = async (req, res) => {
 
     res.status(200).json(ledgers);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
-const getById = async (req, res) => {
+const getById = async (req, res, next) => {
   try {
     const id = req.params.id;
 
@@ -28,11 +28,11 @@ const getById = async (req, res) => {
 
     res.status(200).json(ledger);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
-const create = async (req, res) => {
+const create = async (req, res, next) => {
   try {
     const { name, description } = req.body;
 
@@ -44,11 +44,11 @@ const create = async (req, res) => {
 
     res.status(201).json(newLedger);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
-const update = async (req, res) => {
+const update = async (req, res, next) => {
   try {
     const { name, description } = req.body;
     const id = req.params.id;
@@ -65,11 +65,11 @@ const update = async (req, res) => {
 
     res.status(200).json(updatedLedger);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
-const remove = async (req, res) => {
+const remove = async (req, res, next) => {
   try {
     const id = req.params.id;
 
@@ -81,7 +81,7 @@ const remove = async (req, res) => {
 
     res.status(204).end();
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 

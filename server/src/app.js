@@ -2,7 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 
 const ledgers = require('./api/ledgers');
-const AppError = require('./errors/Apperror');
+const AppError = require('./errors/AppError');
 
 const app = express();
 

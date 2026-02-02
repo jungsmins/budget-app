@@ -36,7 +36,7 @@ const create = async (req, res, next) => {
   try {
     const { name, description } = req.body;
 
-    if (!name || !description) {
+    if (!name) {
       return res.status(400).end();
     }
 

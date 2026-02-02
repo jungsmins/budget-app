@@ -1,3 +1,4 @@
+const AppError = require('../../errors/AppError');
 const Ledger = require('./ledgers.schema');
 const mongoose = require('mongoose');
 
@@ -12,7 +13,7 @@ const findAll = async (limit) => {
 
 const findById = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return null;
+    throw new AppError('Invalid ID format', 400);
   }
 
   const ledger = await Ledger.findById(id).lean();
@@ -27,7 +28,7 @@ const create = async ({ name, description }) => {
 
 const update = async (id, { name, description }) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return null;
+    throw new AppError('Invalid ID format', 400);
   }
 
   const updateData = {};
@@ -44,7 +45,7 @@ const update = async (id, { name, description }) => {
 
 const remove = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return null;
+    throw new AppError('Invalid ID format', 400);
   }
 
   const result = await Ledger.findByIdAndDelete(id);

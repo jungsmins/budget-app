@@ -10,7 +10,6 @@ const ledgerSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      required: [true, 'Description is required'],
       trim: true,
       maxlength: [500, 'Description cannot exceed 500 characters'],
     },

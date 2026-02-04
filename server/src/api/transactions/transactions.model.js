@@ -1,9 +1,10 @@
+const AppError = require('../../errors/AppError');
 const Transactions = require('./transactions.schema');
 const mongoose = require('mongoose');
 
 const findById = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return null;
+    throw new AppError('Invalid ID format', 400);
   }
 
   const transaction = await Transactions.findById(id).lean();
@@ -13,7 +14,7 @@ const findById = async (id) => {
 
 const findByLedgerId = async (ledgerId, filters = {}) => {
   if (!mongoose.Types.ObjectId.isValid(ledgerId)) {
-    return null;
+    throw new AppError('Invalid ID format', 400);
   }
 
   const query = { ledgerId };
@@ -53,7 +54,7 @@ const create = async (
 
 const update = async (id, { type, amount, category, description, date }) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return null;
+    throw new AppError('Invalid ID format', 400);
   }
 
   const updateData = {};
@@ -77,7 +78,7 @@ const update = async (id, { type, amount, category, description, date }) => {
 
 const remove = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return null;
+    throw new AppError('Invalid ID format', 400);
   }
 
   const result = await Transactions.findByIdAndDelete(id);

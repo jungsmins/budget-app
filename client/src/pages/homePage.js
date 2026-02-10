@@ -1,4 +1,5 @@
 import './homePage.css';
+import createModal from '../components/modal';
 
 const ledgers = [
   {
@@ -13,36 +14,64 @@ const ledgers = [
   },
 ];
 
-function homePage() {
-  const mainEl = document.createElement('main');
-  mainEl.className = 'home-container';
+const ledgerFormContent = `
+  <div class="ledger-form">
+    <label>
+      가계부 이름
+      <input type="text" placeholder="가계부 이름을 입력하세요" />
+    </label>
+    <label>
+      가계부 설명
+      <input type="text" placeholder="가계부 설명을 입력하세요" />
+    </label>
+  </div>
+  <div class="ledger-form-buttons">
+    <button class="ledger-form-confirm-button">확인</button>
+    <button class="ledger-form-cancel-button cancel-button">취소</button>
+  </div>
+`;
 
-  const ledgerList = ledgers.map((ledger) => {
+const ledgerDeleteContent = `
+  <p class="ledger-delete-message">가계부를 삭제 하시겠어요?</p>
+  <div class='ledger-delete-buttons'>
+    <button class='ledger-delete-confirm-button'>삭제</button>
+    <button class='ledger-delete-cancel-button cancel-button'>취소</button>
+  </div>
+`;
+
+function homePage() {
+  const ledgerFormModal = createModal(ledgerFormContent);
+  const ledgerDeleteModal = createModal(ledgerDeleteContent);
+
+  const homeEl = document.createElement('main');
+  homeEl.className = 'home-container';
+  homeEl.addEventListener('click', (e) => {
+    if (e.target.closest('.ledger-add-button')) {
+      ledgerFormModal.open();
+    }
+
+    if (e.target.closest('.ledger-delete-button')) {
+      ledgerDeleteModal.open();
+    }
+  });
+
+  const ledgerItems = ledgers.map((ledger) => {
     return `
       <li class="ledger-item">
-        <div class="ledger-actions">
-          <button class="ledger-update-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
-              <path d="m15 5 4 4"/>
-            </svg>
-          </button>
-          <button class="ledger-delete-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 6h18"/>
-              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-            </svg>
-          </button>
-        </div>
+        <button class="ledger-delete-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/>
+            <path d="m6 6 12 12"/>
+          </svg>
+        </button>
         ${ledger.title}
       </li>
     `;
   });
 
-  mainEl.innerHTML = `
+  homeEl.innerHTML = `
     <ul class="ledger-list">
-      ${ledgerList.join('')}
+      ${ledgerItems.join('')}
       <li class="ledger-add-button">
         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 5v14"/>
@@ -52,7 +81,7 @@ function homePage() {
     </ul>
   `;
 
-  return mainEl;
+  return homeEl;
 }
 
 export default homePage;

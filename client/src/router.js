@@ -10,10 +10,26 @@ function createRouter() {
     routes[path] = el;
   }
 
+  function matchRoute(routePath, currentPath) {
+    const routeSegments = routePath.split('/');
+    const currentSegments = currentPath.split('/');
+
+    if (routeSegments.length !== currentSegments.length) {
+      return false;
+    }
+
+    return routeSegments.every((routeSegment, i) => {
+      return (
+        routeSegment.startsWith(':') || routeSegment === currentSegments[i]
+      );
+    });
+  }
+
   function render() {
     for (const route in routes) {
-      if (location.pathname === route) {
+      if (matchRoute(route, location.pathname)) {
         page.replaceChildren(routes[route]);
+        return;
       }
     }
   }

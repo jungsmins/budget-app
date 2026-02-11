@@ -1,32 +1,22 @@
 import './homePage.css';
-import createModal from '../components/modal';
 
-const ledgers = [
-  {
-    id: 1,
-    title: '첫번째 가계부',
-    description: '가계부 설명',
-  },
-  {
-    id: 2,
-    title: '두번째 가계부',
-    description: '가계부 설명',
-  },
-];
+import createModal from '../components/modal';
+import router from '../router';
+import { getAll, create, remove } from '../api/ledgers';
 
 const ledgerFormContent = `
   <div class="ledger-form">
     <label>
       가계부 이름
-      <input type="text" placeholder="가계부 이름을 입력하세요" />
+      <input name="name" type="text" placeholder="가계부 이름을 입력하세요" />
     </label>
     <label>
       가계부 설명
-      <input type="text" placeholder="가계부 설명을 입력하세요" />
+      <input name="description" type="text" placeholder="가계부 설명을 입력하세요" />
     </label>
   </div>
   <div class="ledger-form-buttons">
-    <button class="ledger-form-confirm-button">확인</button>
+    <button class="ledger-form-confirm-button confirm-button">확인</button>
     <button class="ledger-form-cancel-button cancel-button">취소</button>
   </div>
 `;
@@ -34,37 +24,28 @@ const ledgerFormContent = `
 const ledgerDeleteContent = `
   <p class="ledger-delete-message">가계부를 삭제 하시겠어요?</p>
   <div class='ledger-delete-buttons'>
-    <button class='ledger-delete-confirm-button'>삭제</button>
+    <button class='ledger-delete-confirm-button confirm-button'>삭제</button>
     <button class='ledger-delete-cancel-button cancel-button'>취소</button>
   </div>
 `;
 
-function homePage() {
-  const ledgerFormModal = createModal(ledgerFormContent);
-  const ledgerDeleteModal = createModal(ledgerDeleteContent);
+async function renderLedgerList(homeEl) {
+  let ledgers = await getAll();
 
-  const homeEl = document.createElement('main');
-  homeEl.className = 'home-container';
-  homeEl.addEventListener('click', (e) => {
-    if (e.target.closest('.ledger-add-button')) {
-      ledgerFormModal.open();
-    }
-
-    if (e.target.closest('.ledger-delete-button')) {
-      ledgerDeleteModal.open();
-    }
-  });
+  if (!ledgers) {
+    ledgers = [];
+  }
 
   const ledgerItems = ledgers.map((ledger) => {
     return `
-      <li class="ledger-item">
+      <li class="ledger-item" data-id="${ledger.id}">
         <button class="ledger-delete-button">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M18 6 6 18"/>
             <path d="m6 6 12 12"/>
           </svg>
         </button>
-        ${ledger.title}
+        ${ledger.name}
       </li>
     `;
   });
@@ -80,6 +61,52 @@ function homePage() {
       </li>
     </ul>
   `;
+}
+
+function homePage() {
+  let deleteTargetId = null;
+
+  const ledgerFormModal = createModal(ledgerFormContent, {
+    onConfirm: async (data) => {
+      await create(data);
+      renderLedgerList(homeEl);
+    },
+  });
+
+  const ledgerDeleteModal = createModal(ledgerDeleteContent, {
+    onConfirm: async () => {
+      await remove(deleteTargetId);
+      renderLedgerList(homeEl);
+    },
+  });
+
+  const homeEl = document.createElement('main');
+  homeEl.className = 'home-container';
+
+  homeEl.addEventListener('click', (e) => {
+    if (e.target.closest('.ledger-add-button')) {
+      ledgerFormModal.open();
+      return;
+    }
+
+    const item = e.target.closest('.ledger-item');
+
+    if (!item) {
+      return;
+    }
+
+    const id = item.dataset.id;
+
+    if (e.target.closest('.ledger-delete-button')) {
+      deleteTargetId = id;
+      ledgerDeleteModal.open();
+      return;
+    }
+
+    router.navigate(`/ledgers/${id}`);
+  });
+
+  renderLedgerList(homeEl);
 
   return homeEl;
 }

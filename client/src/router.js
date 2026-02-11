@@ -39,6 +39,10 @@ function createRouter() {
     render();
   }
 
+  window.addEventListener('popstate', () => {
+    render();
+  });
+
   return {
     init,
     route,

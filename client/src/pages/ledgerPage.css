@@ -1,0 +1,274 @@
+.ledger-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 16px;
+}
+
+.ledger-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.ledger-edit-button {
+  display: flex;
+  align-items: center;
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.ledger-edit-button:hover {
+  color: #666;
+}
+
+.transaction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.transaction-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.transaction-category {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.transaction-description {
+  font-size: 0.875rem;
+}
+
+.transaction-date {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+.transaction-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.transaction-amount {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.transaction-delete-button {
+  display: flex;
+  align-items: center;
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.transaction-delete-button:hover {
+  color: #e74c3c;
+}
+
+.transaction-amount.income {
+  color: #2ecc71;
+}
+
+.transaction-amount.expense {
+  color: #e74c3c;
+}
+
+.transaction-item:has(.transaction-add-button) {
+  justify-content: center;
+}
+
+.transaction-add-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #ddd;
+  color: #666;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.transaction-add-button:hover {
+  background-color: #ccc;
+  color: #333;
+}
+
+.transaction-summary {
+  display: flex;
+  justify-content: space-around;
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.summary-label {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+.summary-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.summary-value.income {
+  color: #2ecc71;
+}
+
+.summary-value.expense {
+  color: #e74c3c;
+}
+
+.transaction-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.transaction-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.transaction-type-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.type-button {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #999;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.type-button.income.active {
+  border-color: #2ecc71;
+  color: #2ecc71;
+  background-color: #eafaf1;
+}
+
+.type-button.expense.active {
+  border-color: #e74c3c;
+  color: #e74c3c;
+  background-color: #fdedec;
+}
+
+.transaction-form input {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.transaction-form input:focus {
+  border-color: #999;
+}
+
+.transaction-form input[type='number']::-webkit-inner-spin-button,
+.transaction-form input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.transaction-form-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.transaction-form-confirm-button,
+.transaction-form-cancel-button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #fff;
+  cursor: pointer;
+}
+
+.transaction-form-confirm-button {
+  background-color: #2ecc71;
+}
+
+.transaction-form-cancel-button {
+  background-color: #e74c3c;
+}
+
+.transaction-delete-message {
+  margin-bottom: 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.transaction-delete-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.transaction-delete-confirm-button,
+.transaction-delete-cancel-button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #fff;
+  cursor: pointer;
+}
+
+.transaction-delete-confirm-button {
+  background-color: #e74c3c;
+}
+
+.transaction-delete-cancel-button {
+  background-color: #999;
+}

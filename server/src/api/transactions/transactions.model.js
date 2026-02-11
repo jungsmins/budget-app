@@ -7,7 +7,7 @@ const findById = async (id) => {
     throw new AppError('Invalid ID format', 400);
   }
 
-  const transaction = await Transactions.findById(id).lean();
+  const transaction = await Transactions.findById(id);
 
   return transaction;
 };
@@ -27,7 +27,7 @@ const findByLedgerId = async (ledgerId, filters = {}) => {
     query.date = { $regex: `^${filters.month}` };
   }
 
-  const transactions = await Transactions.find(query).sort({ date: -1 }).lean();
+  const transactions = await Transactions.find(query).sort({ date: -1 });
 
   return transactions;
 };
@@ -71,7 +71,7 @@ const update = async (id, { type, amount, category, description, date }) => {
       new: true,
       runValidators: true,
     },
-  ).lean();
+  );
 
   return updateTransaction;
 };

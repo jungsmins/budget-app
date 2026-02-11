@@ -5,8 +5,7 @@ const mongoose = require('mongoose');
 const findAll = async (limit) => {
   const ledgers = await Ledger.find()
     .sort({ createdAt: -1 })
-    .limit(limit)
-    .lean();
+    .limit(limit);
 
   return ledgers;
 };
@@ -16,7 +15,7 @@ const findById = async (id) => {
     throw new AppError('Invalid ID format', 400);
   }
 
-  const ledger = await Ledger.findById(id).lean();
+  const ledger = await Ledger.findById(id);
 
   return ledger;
 };
@@ -38,7 +37,7 @@ const update = async (id, { name, description }) => {
   const updateLedger = await Ledger.findByIdAndUpdate(id, updateData, {
     new: true,
     runValidators: true,
-  }).lean();
+  });
 
   return updateLedger;
 };

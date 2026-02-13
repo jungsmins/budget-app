@@ -2,7 +2,7 @@ import './homePage.css';
 
 import createModal from '../components/modal';
 import router from '../router';
-import { getAll, create, remove } from '../api/ledgers';
+import * as ledgersApi from '../api/ledgers';
 
 const ledgerFormContent = `
   <div class="ledger-form">
@@ -30,7 +30,7 @@ const ledgerDeleteContent = `
 `;
 
 async function renderLedgerList(homeEl) {
-  let ledgers = await getAll();
+  let ledgers = await ledgersApi.getAll();
 
   if (!ledgers) {
     ledgers = [];
@@ -66,22 +66,22 @@ async function renderLedgerList(homeEl) {
 function homePage() {
   let deleteTargetId = null;
 
+  const homeEl = document.createElement('main');
+  homeEl.className = 'home-container';
+
   const ledgerFormModal = createModal(ledgerFormContent, {
     onConfirm: async (data) => {
-      await create(data);
+      await ledgersApi.create(data);
       renderLedgerList(homeEl);
     },
   });
 
   const ledgerDeleteModal = createModal(ledgerDeleteContent, {
     onConfirm: async () => {
-      await remove(deleteTargetId);
+      await ledgersApi.remove(deleteTargetId);
       renderLedgerList(homeEl);
     },
   });
-
-  const homeEl = document.createElement('main');
-  homeEl.className = 'home-container';
 
   homeEl.addEventListener('click', (e) => {
     if (e.target.closest('.ledger-add-button')) {
@@ -105,6 +105,11 @@ function homePage() {
 
     router.navigate(`/ledgers/${id}`);
   });
+
+  homeEl.cleanup = () => {
+    ledgerFormModal.destroy();
+    ledgerDeleteModal.destroy();
+  };
 
   renderLedgerList(homeEl);
 

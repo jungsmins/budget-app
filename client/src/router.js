@@ -6,8 +6,8 @@ function createRouter() {
     page = pageEl;
   }
 
-  function route(el, path) {
-    routes[path] = el;
+  function route(handler, path) {
+    routes[path] = handler;
   }
 
   function matchRoute(routePath, currentPath) {
@@ -26,9 +26,16 @@ function createRouter() {
   }
 
   function render() {
+    const oldEl = page.firstElementChild;
+    if (oldEl?.cleanup) {
+      oldEl.cleanup();
+    }
+
     for (const route in routes) {
       if (matchRoute(route, location.pathname)) {
-        page.replaceChildren(routes[route]);
+        const handler = routes[route];
+        const el = typeof handler === 'function' ? handler() : handler;
+        page.replaceChildren(el);
         return;
       }
     }

@@ -12,7 +12,14 @@ function createModal(content, eventHandler) {
   modalLayout.appendChild(modal);
   document.body.appendChild(modalLayout);
 
-  function open() {
+  function open(data) {
+    if (data) {
+      Object.entries(data).forEach(([key, value]) => {
+        const input = modal.querySelector(`[name="${key}"]`);
+        input.value = value;
+      });
+    }
+
     modalLayout.classList.add('show');
   }
 
@@ -27,10 +34,10 @@ function createModal(content, eventHandler) {
 
     if (e.target.closest('.confirm-button')) {
       const data = {};
-      const items = modal.querySelectorAll('input, select');
-
+      const items = modal.querySelectorAll('input, .active');
       items.forEach((item) => {
-        data[item.name] = item.value;
+        data[item.name] = item.value || item.dataset.type;
+        item.value = '';
       });
 
       eventHandler.onConfirm(data);
@@ -45,9 +52,14 @@ function createModal(content, eventHandler) {
     }
   });
 
+  function destroy() {
+    modalLayout.remove();
+  }
+
   return {
     open,
     close,
+    destroy,
     el: modal,
   };
 }

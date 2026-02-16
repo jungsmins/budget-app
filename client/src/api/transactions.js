@@ -1,7 +1,21 @@
 import request from './client';
 
-export const getAll = (ledgerId) => {
-  return request(`/ledgers/${ledgerId}/transactions`);
+export const getAll = (ledgerId, filters = {}) => {
+  const params = new URLSearchParams();
+
+  if (filters.month) {
+    params.append('month', filters.month);
+  }
+
+  if (filters.category) {
+    params.append('category', filters.category);
+  }
+
+  const query = params.toString();
+
+  return request(
+    `/ledgers/${ledgerId}/transactions${query ? `?${query}` : ''}`,
+  );
 };
 
 export const create = (ledgerId, data) => {

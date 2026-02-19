@@ -3,17 +3,18 @@ import './homePage.css';
 import createModal from '../components/modal';
 import router from '../router';
 import * as ledgersApi from '../api/ledgers';
+import { validateLedger } from '../utils/validation';
 
 const ledgerFormContent = `
   <div class="ledger-form">
-    <label>
-      가계부 이름
+    <div class="form-field">
+      <label>가계부 이름</label>
       <input name="name" type="text" placeholder="가계부 이름을 입력하세요" />
-    </label>
-    <label>
-      가계부 설명
+    </div>
+    <div class="form-field">
+      <label>가계부 설명</label>
       <input name="description" type="text" placeholder="가계부 설명을 입력하세요" />
-    </label>
+    </div>
   </div>
   <div class="ledger-form-buttons">
     <button class="ledger-form-confirm-button confirm-button">확인</button>
@@ -74,6 +75,7 @@ function homePage() {
       await ledgersApi.create(data);
       renderLedgerList(homeEl);
     },
+    validator: validateLedger,
   });
 
   const ledgerDeleteModal = createModal(ledgerDeleteContent, {

@@ -212,7 +212,7 @@
   gap: 12px;
 }
 
-.transaction-form label {
+.transaction-form .form-field {
   display: flex;
   flex-direction: column;
   gap: 4px;

@@ -25,6 +25,18 @@ function createModal(content, eventHandler) {
 
   function close() {
     modalLayout.classList.remove('show');
+
+    const inputs = modal.querySelectorAll('input');
+    inputs.forEach((input) => {
+      input.value = '';
+    });
+
+    clearErrors();
+  }
+
+  function clearErrors() {
+    const errorMessages = modal.querySelectorAll('.error-message');
+    errorMessages.forEach((error) => error.remove());
   }
 
   modal.addEventListener('click', (e) => {
@@ -37,11 +49,32 @@ function createModal(content, eventHandler) {
       const items = modal.querySelectorAll('input, .active');
       items.forEach((item) => {
         data[item.name] = item.value || item.dataset.type;
-        item.value = '';
       });
 
-      eventHandler.onConfirm(data);
+      clearErrors();
 
+      if (eventHandler.validator) {
+        const errors = eventHandler.validator(data);
+
+        if (Object.keys(errors).length > 0) {
+          for (const name in errors) {
+            const item = Array.from(items).find((item) => {
+              return item.name === name;
+            });
+
+            if (item) {
+              const errorMessage = document.createElement('span');
+              errorMessage.className = 'error-message';
+              errorMessage.innerText = errors[name];
+              item.insertAdjacentElement('afterend', errorMessage);
+            }
+          }
+
+          return;
+        }
+      }
+
+      eventHandler.onConfirm(data);
       close();
     }
   });

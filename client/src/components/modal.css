@@ -25,3 +25,10 @@
   padding: 24px;
   border-radius: 12px;
 }
+
+.error-message {
+  display: block;
+  color: #e74c3c;
+  font-size: 0.875rem;
+  margin-top: 4px;
+}

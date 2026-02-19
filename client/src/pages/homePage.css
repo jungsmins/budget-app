@@ -76,7 +76,7 @@
   gap: 12px;
 }
 
-.ledger-form label {
+.ledger-form .form-field {
   display: flex;
   flex-direction: column;
   gap: 4px;

@@ -2,6 +2,7 @@ import './ledgerPage.css';
 import createModal from '../components/modal';
 import * as transactionsApi from '../api/transactions';
 import * as ledgersApi from '../api/ledgers';
+import { validateLedger, validateTransaction } from '../utils/validation';
 
 const transactionFormContent = `
   <div class="transaction-form">
@@ -9,22 +10,22 @@ const transactionFormContent = `
       <button name="type" class="type-button income active" data-type="income">수입</button>
       <button name="type" class="type-button expense" data-type="expense">지출</button>
     </div>
-    <label>
-      금액
+    <div class="form-field">
+      <label>금액</label>
       <input name="amount" type="number" placeholder="금액을 입력하세요" />
-    </label>
-    <label>
-      카테고리
+    </div>
+    <div class="form-field">
+      <label>카테고리</label>
       <input name="category" type="text" placeholder="카테고리를 입력하세요" />
-    </label>
-    <label>
-      내용
+    </div>
+    <div class="form-field">
+      <label>내용</label>
       <input name="description" type="text" placeholder="내용을 입력하세요" />
-    </label>
-    <label>
-      날짜
+    </div>
+    <div class="form-field">
+      <label>날짜</label>
       <input name="date" type="date" />
-    </label>
+    </div>
   </div>
   <div class="transaction-form-buttons">
     <button class="transaction-form-confirm-button confirm-button">확인</button>
@@ -42,14 +43,14 @@ const transactionDeleteContent = `
 
 const ledgerFormContent = `
   <div class="ledger-form">
-    <label>
-      가계부 이름
+    <div class="form-field">
+      <label>가계부 이름</label>
       <input name="name" type="text" placeholder="가계부 이름을 입력하세요" />
-    </label>
-    <label>
-      가계부 설명
+    </div>
+    <div class="form-field">
+      <label>가계부 설명</label>
       <input name="description" type="text" placeholder="가계부 설명을 입력하세요" />
-    </label>
+    </div>
   </div>
   <div class="ledger-form-buttons">
     <button class="ledger-form-confirm-button confirm-button">확인</button>
@@ -61,7 +62,10 @@ async function renderTransactionList(ledgerId, ledgerEl, filters = {}) {
   const [transactions, allTransactions, ledger] = await Promise.all([
     transactionsApi.getAll(ledgerId, filters),
     filters.month || filters.category
-      ? transactionsApi.getAll(ledgerId, filters.month ? { month: filters.month } : {})
+      ? transactionsApi.getAll(
+          ledgerId,
+          filters.month ? { month: filters.month } : {},
+        )
       : null,
     ledgersApi.getById(ledgerId),
   ]);
@@ -174,6 +178,7 @@ function ledgerPage() {
       await transactionsApi.create(ledgerId, data);
       renderTransactionList(ledgerId, ledgerEl, currentFilters);
     },
+    validator: validateTransaction,
   });
 
   const transactionDeleteModal = createModal(transactionDeleteContent, {
@@ -188,6 +193,7 @@ function ledgerPage() {
       await transactionsApi.update(ledgerId, transactionId, data);
       renderTransactionList(ledgerId, ledgerEl, currentFilters);
     },
+    validator: validateTransaction,
   });
 
   const ledgerEditModal = createModal(ledgerFormContent, {
@@ -195,6 +201,7 @@ function ledgerPage() {
       await ledgersApi.update(ledgerId, data);
       renderTransactionList(ledgerId, ledgerEl, currentFilters);
     },
+    validator: validateLedger,
   });
 
   function handleTypeToggle(e) {
@@ -214,13 +221,19 @@ function ledgerPage() {
 
   ledgerEl.addEventListener('change', (e) => {
     if (e.target.matches('.filter-month')) {
-      currentFilters = { ...currentFilters, month: e.target.value || undefined };
+      currentFilters = {
+        ...currentFilters,
+        month: e.target.value || undefined,
+      };
       renderTransactionList(ledgerId, ledgerEl, currentFilters);
       return;
     }
 
     if (e.target.matches('.filter-category')) {
-      currentFilters = { ...currentFilters, category: e.target.value || undefined };
+      currentFilters = {
+        ...currentFilters,
+        category: e.target.value || undefined,
+      };
       renderTransactionList(ledgerId, ledgerEl, currentFilters);
       return;
     }
@@ -264,7 +277,8 @@ function ledgerPage() {
           description: transaction.description,
           date: transaction.date,
         });
-        const typeButtons = transactionEditModal.el.querySelectorAll('.type-button');
+        const typeButtons =
+          transactionEditModal.el.querySelectorAll('.type-button');
         typeButtons.forEach((btn) => {
           btn.classList.toggle('active', btn.dataset.type === transaction.type);
         });
